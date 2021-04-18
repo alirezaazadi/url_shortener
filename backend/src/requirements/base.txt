@@ -1,0 +1,13 @@
+Django~=3.2
+django-environ==0.4.5
+django-redis==4.12.1
+django-user-agents==0.4.0
+djangorestframework==3.12.4
+djangorestframework-simplejwt==4.6.0
+psycopg2==2.8.6
+pybase62==0.4.3
+django-cacheops==5.1
+django-pickling==1.0
+django-celery-beat==2.2.0
+celery==5.0.5
+architect==0.6.0
