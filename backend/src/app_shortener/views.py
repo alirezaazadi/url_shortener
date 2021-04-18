@@ -17,14 +17,14 @@ def _query_builder(url_instance, _range, user_specific):
     if user_specific:
         return History.objects.values('browser', 'platform'). \
             filter(url=url_instance, created_at__range=_range). \
-            annotate(Count('user')).order_by().cache(timeout=60 * 60 * 24)
+            annotate(Count('user')).order_by()
     else:
         return History.objects.values('browser', 'platform'). \
             filter(url=url_instance, created_at__range=_range). \
             annotate(Count('browser'), Count('platform')).values('platform',
                                                                  'platform__count',
                                                                  'browser',
-                                                                 'browser__count').cache(timeout=60 * 60 * 24)
+                                                                 'browser__count')
 
 
 def _build_response(queryset_result, user_specific, key):
