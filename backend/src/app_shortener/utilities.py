@@ -1,11 +1,15 @@
-import datetime
-import hashlib
-from datetime import timedelta
-from random import randrange
-
 import base62
+import random
+import hashlib
+import datetime
+
+from random import randrange
+from datetime import datetime
+from datetime import timedelta
+
 from django.utils import timezone
 from django.utils.timezone import make_aware
+
 
 
 def generate_random_string(original_string: str, base_string: str = None, result_length: int = 8) -> str:
@@ -39,10 +43,6 @@ def get_date_range(date):
 
 def random_date(start, end):
     """
-    This function will return a random datetime between two datetime
-    objects.
+    return a random datetime between two datetime objects.
     """
-    delta = end - start
-    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
-    random_second = randrange(int_delta)
-    return start + timedelta(seconds=random_second)
+    return datetime.fromtimestamp(random.uniform(start.timestamp(), end.timestamp()))
