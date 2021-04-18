@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8-slim
 
 # Install required packages
 RUN apt-get update && \
