@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from app_shortener.models import URLMap, History
 from app_shortener.serializers import CreateShortURLSerializer
-from app_shortener.tasks import save_history
+from app_shortener.tasks import cache_statistics_in_disk
 from app_shortener.utilities import get_date_range, get_n_unit_ago
 from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
@@ -124,9 +124,9 @@ class URLStatisticsAPIView(RetrieveAPIView):
         else:
             queryset = _query_builder(instance, _convert_time_frame_to_range(timeframe), user_specific)
             response = _build_response(queryset, user_specific, key=key)
-            saving_daily_reports.apply_async(kwargs={'instance': pickle.dumps(instance),
-                                                     'response': response,
-                                                     'field': _get_proper_field(timeframe)})
+            cache_statistics_in_disk.apply_async(kwargs={'instance': pickle.dumps(instance),
+                                                         'response': response,
+                                                         'field': _get_proper_field(timeframe)})
         return Response(data=response[key])
 
 

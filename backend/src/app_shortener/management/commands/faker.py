@@ -16,6 +16,26 @@ URL_COUNT = 100
 DAYS_AGO = 80
 
 
+def generate_url(count):
+    user_pks = list(User.objects.all().order_by('?').values_list('pk', flat=True)[:USER_COUNT])
+    buffer = list()
+    for _ in range(count):
+        original_string = str(uuid.uuid1())
+
+        buffer.append(URLMap(
+            user_id=random.choice(user_pks),
+            short_url=generate_random_string(original_string=original_string),
+            original_url=original_string,
+        ))
+
+        if len(buffer) == 1000:
+            URLMap.objects.bulk_create(buffer, batch_size=1000)
+            buffer.clear()
+
+    if buffer:
+        URLMap.objects.bulk_create(buffer, batch_size=len(buffer))
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-c', type=int, default=10_000_000, help='count of fake data')
@@ -53,29 +73,10 @@ class Command(BaseCommand):
 
         self._generate_in_bulk(User, instance_callback(), count)
 
-    def generate_url(self, count):
-        user_pks = list(User.objects.all().order_by('?').values_list('pk', flat=True)[:USER_COUNT])
-        buffer = list()
-        for _ in range(count):
-            original_string = str(uuid.uuid1())
-
-            buffer.append(URLMap(
-                user_id=random.choice(user_pks),
-                short_url=generate_random_string(original_string=original_string),
-                original_url=original_string,
-            ))
-
-            if len(buffer) == 1000:
-                URLMap.objects.bulk_create(buffer, batch_size=1000)
-                buffer.clear()
-
-        if buffer:
-            URLMap.objects.bulk_create(buffer, batch_size=len(buffer))
-
     def generate_history(self, count):
         if URLMap.objects.count() < URL_COUNT:
             self.stdout.write(self.style.SUCCESS('Generating URLS'))
-            self.generate_url(URL_COUNT)
+            generate_url(URL_COUNT)
             self.stdout.write(self.style.SUCCESS('URLS DONE'))
 
         url_pks = URLMap.objects.all().order_by('?').values_list('pk', flat=True)[:URL_COUNT]
@@ -98,7 +99,7 @@ class Command(BaseCommand):
                 yield History(
                     user_id=random.choice(user_pks),
                     url_id=random.choice(url_pks),
-                    created_at=random_date(*date_range),
+                    created_at=make_aware(random_date(*date_range)),
                     platform=random.choice(History.Platform.choices)[0],
                     browser=random.choice(browsers)
                 )
@@ -121,8 +122,8 @@ class Command(BaseCommand):
             # generating urls
 
             self.stdout.write(self.style.WARNING('Generating URLS'))
-            self.generate_url(count)
-            self.stdout.write(self.style.WARNING('URLS DONE'))
+            generate_url(count)
+            self.stdout.write(self.style.SUCCESS('URLS DONE'))
 
             # generating statistics
             self.stdout.write(self.style.WARNING('Generating Statistics'))
