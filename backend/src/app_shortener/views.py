@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from app_shortener.models import URLMap, History
 from app_shortener.serializers import CreateShortURLSerializer
-from app_shortener.tasks import cache_statistics_in_disk
+from app_shortener.tasks import cache_statistics_in_disk, save_history
 from app_shortener.utilities import get_date_range, get_n_unit_ago
 from django.db.models import Count
 from django.http import HttpResponseRedirect, Http404
