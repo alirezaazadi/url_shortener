@@ -4,7 +4,6 @@ import architect
 import base62
 from app_shortener.utilities import generate_random_string
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.indexes import HashIndex
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
@@ -28,10 +27,6 @@ class URLMap(models.Model):
 
     cached_statistics = models.JSONField(default=dict)
 
-    class Meta:
-        indexes = [
-            HashIndex(fields=('short_url',)),
-        ]
 
     @staticmethod
     def _rebuild_user_string(base_string, frame_length):
